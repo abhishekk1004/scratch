@@ -1,4 +1,4 @@
-import 'package:scratch/model/product_model.dart';
+import 'package:scratch/models/product_model.dart';
 
 abstract class ProductRepo {
 

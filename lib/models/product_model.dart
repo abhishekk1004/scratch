@@ -14,10 +14,10 @@ class ProductModel {
 
   Map<String, dynamic> toMap() {
     return {
-      'id': this.id,
-      'name': this.name,
-      'price': this.price,
-      'description': this.description,
+      'id': id,
+      'name': name,
+      'price': price,
+      'description': description,
     };
   }
 
