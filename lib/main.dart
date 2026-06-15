@@ -2,7 +2,7 @@ import 'package:scratch/constants/colors.dart';
 import 'package:scratch/repo/product_repo.dart';
 import 'package:scratch/repo/product_repo_impl.dart';
 import 'package:scratch/view/home_screen.dart';
-import 'package:scratch/viewmodels/product_view_model.dart';
+import 'package:scratch/viewmodel/product_view_model.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
