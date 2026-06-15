@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:scratch/models/product_model.dart';
 import 'package:scratch/viewmodels/product_view_model.dart';
@@ -11,30 +12,27 @@ class ManageProductScreen extends StatefulWidget {
 }
 
 class _ManageProductScreenState extends State<ManageProductScreen> {
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _priceController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
-  final TextEditingController _categoryController = TextEditingController();
+  final nameController = TextEditingController();
+  final priceController = TextEditingController();
+  final descController = TextEditingController();
+  final categoryController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
 
   @override
   void dispose() {
-    _nameController.dispose();
-    _priceController.dispose();
-    _descriptionController.dispose();
-    _categoryController.dispose();
+    nameController.dispose();
+    priceController.dispose();
+    descController.dispose();
+    categoryController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final productViewModel = context.watch<ProductViewModel>();
-
+    final vm = context.watch<ProductViewModel>();
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Manage Product"),
-      ),
+      appBar: AppBar(title: const Text("Add Product")),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -43,99 +41,53 @@ class _ManageProductScreenState extends State<ManageProductScreen> {
             child: Column(
               children: [
                 TextFormField(
-                  controller: _nameController,
-                  decoration: const InputDecoration(
-                    labelText: "Product Name",
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "Please enter product name";
-                    }
-                    return null;
-                  },
+                  controller: nameController,
+                  decoration: const InputDecoration(labelText: "Product Name"),
+                  validator: (value) => value == null || value.isEmpty ? "Required" : null,
                 ),
-                const SizedBox(height: 16),
                 TextFormField(
-                  controller: _priceController,
-                  decoration: const InputDecoration(
-                    labelText: "Price",
-                    border: OutlineInputBorder(),
-                  ),
+                  controller: priceController,
+                  decoration: const InputDecoration(labelText: "Price"),
                   keyboardType: TextInputType.number,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "Please enter price";
-                    }
-                    if (double.tryParse(value) == null) {
-                      return "Please enter a valid number";
-                    }
-                    return null;
-                  },
+                  validator: (value) => value == null || double.tryParse(value) == null ? "Enter a valid price" : null,
                 ),
-                const SizedBox(height: 16),
                 TextFormField(
-                  controller: _categoryController,
-                  decoration: const InputDecoration(
-                    labelText: "Category",
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "Please enter category";
-                    }
-                    return null;
-                  },
+                  controller: categoryController,
+                  decoration: const InputDecoration(labelText: "Category"),
+                  validator: (value) => value == null || value.isEmpty ? "Required" : null,
                 ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _descriptionController,
+                TextFormField(
+                  controller: descController,
+                  decoration: const InputDecoration(labelText: "Description"),
                   maxLines: 3,
-                  decoration: const InputDecoration(
-                    labelText: "Description",
-                    border: OutlineInputBorder(),
-                    alignLabelWithHint: true,
-                  ),
                 ),
-                const SizedBox(height: 24),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: productViewModel.loading
-                        ? null
-                        : () async {
-                            if (_formKey.currentState!.validate()) {
-                              final product = ProductModel(
-                                name: _nameController.text,
-                                price: double.parse(_priceController.text),
-                                category: _categoryController.text,
-                                description: _descriptionController.text,
-                              );
-
-                              final success = await productViewModel.addProduct(product);
-
-                              if (mounted) {
-                                if (success) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text("Product saved successfully!")),
-                                  );
-                                  Navigator.pop(context);
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text(productViewModel.error ?? "Failed to save product")),
-                                  );
-                                }
-                              }
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: vm.loading
+                      ? null
+                      : () async {
+                          if (_formKey.currentState!.validate()) {
+                            final model = ProductModel(
+                              id: "",
+                              name: nameController.text,
+                              price: double.parse(priceController.text),
+                              description: descController.text,
+                              category: categoryController.text,
+                            );
+                            final success = await vm.addProduct(model);
+                            
+                            if (!context.mounted) return;
+                            
+                            if (success) {
+                              Navigator.pop(context);
+                            } else {
+                              Fluttertoast.showToast(msg: vm.error.toString());
                             }
-                          },
-                    child: productViewModel.loading
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text(
-                            "Save Product",
-                            style: TextStyle(fontSize: 18),
-                          ),
-                  ),
+                          }
+                        },
+                  child: vm.loading
+                      ? const CircularProgressIndicator()
+                      : const Text("Add Product"),
                 ),
               ],
             ),
