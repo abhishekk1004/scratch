@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:scratch/models/product_model.dart';
-import 'package:scratch/viewmodels/product_view_model.dart';
+import 'package:scratch/viewmodel/product_view_model.dart';
 
 class ManageProductScreen extends StatefulWidget {
   const ManageProductScreen({super.key});
