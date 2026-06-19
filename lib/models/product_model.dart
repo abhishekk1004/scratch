@@ -5,6 +5,7 @@ class ProductModel {
   String? categoryId;
   String? description;
   String? category;
+  String? imageUrl;
 
   ProductModel({
     this.id,
@@ -12,6 +13,7 @@ class ProductModel {
     this.price,
     this.description,
     this.category,
+    this.imageUrl,
   });
 
   Map<String, dynamic> toMap() {
@@ -21,6 +23,7 @@ class ProductModel {
       'price': price,
       'description': description,
       'category': category,
+      'image':imageUrl,
     };
   }
 
@@ -31,6 +34,7 @@ class ProductModel {
       price: (map['price'] as num?)?.toDouble(),
       description: map['description'] as String?,
       category: map['category'] as String?,
+      imageUrl: map['image'] as String?,
     );
   }
 }
