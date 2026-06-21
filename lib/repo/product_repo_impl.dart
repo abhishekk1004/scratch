@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:scratch/models/product_model.dart';
 import 'package:scratch/repo/product_repo.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -20,53 +19,43 @@ class ProductRepoImpl implements ProductRepo {
 
   @override
   Future<List<ProductModel>> filterProduct(double price) async {
-    final data = await collection.where('price',isLessThanOrEqualTo: price).get();
-    //return data.docs.map((doc) => ProductModel.fromMap(doc.data())).toList();
-
-    List<ProductModel> products=[];
-
-    for(int i=0;i<data.docs.length;i++){
-      products.add(ProductModel.fromMap(data.docs[i].data()));
-    }
-    return products;
+    final querySnapshot = await collection.where('price', isLessThanOrEqualTo: price).get();
+    return querySnapshot.docs.map((doc) {
+      final product = ProductModel.fromMap(doc.data());
+      product.id = doc.id;
+      return product;
+    }).toList();
   }
 
   @override
   Future<List<ProductModel>> getAllProduct() async {
-    final data = await collection.get();
-    //return data.docs.map((doc) => ProductModel.fromMap(doc.data())).toList();
-
-    List<ProductModel> products=[];
-
-    for(int i=0;i<data.docs.length;i++){
-      products.add(ProductModel.fromMap(data.docs[i].data()));
-    }
-    return products;
+    final querySnapshot = await collection.get();
+    return querySnapshot.docs.map((doc) {
+      final product = ProductModel.fromMap(doc.data());
+      product.id = doc.id;
+      return product;
+    }).toList();
   }
 
   @override
   Future<List<ProductModel>> getProductByCategory(String categoryId) async {
-    final data = await collection.where('categoryId',isEqualTo: categoryId).get();
-    //return data.docs.map((doc) => ProductModel.fromMap(doc.data())).toList();
-
-    List<ProductModel> products=[];
-
-    for(int i=0;i<data.docs.length;i++){
-      products.add(ProductModel.fromMap(data.docs[i].data()));
-    }
-    return products;
+    final querySnapshot = await collection.where('categoryId', isEqualTo: categoryId).get();
+    return querySnapshot.docs.map((doc) {
+      final product = ProductModel.fromMap(doc.data());
+      product.id = doc.id;
+      return product;
+    }).toList();
   }
 
   @override
   Future<ProductModel> getProductById(String id) async {
-    final data = await collection.doc(id).get();
-    final products= data.data();
-
-
-    if(products==null){
-      throw Exception("Product 404");
+    final doc = await collection.doc(id).get();
+    if (!doc.exists) {
+      throw Exception("Product not found");
     }
-    return ProductModel.fromMap(products);
+    final product = ProductModel.fromMap(doc.data()!);
+    product.id = doc.id;
+    return product;
   }
 
   @override
@@ -75,11 +64,18 @@ class ProductRepoImpl implements ProductRepo {
         .where('name', isGreaterThanOrEqualTo: name)
         .where('name', isLessThanOrEqualTo: '$name\uf8ff')
         .get();
-    return querySnapshot.docs.map((doc) => ProductModel.fromMap(doc.data())).toList();
+    return querySnapshot.docs.map((doc) {
+      final product = ProductModel.fromMap(doc.data());
+      product.id = doc.id;
+      return product;
+    }).toList();
   }
 
   @override
   Future<void> updateProduct(ProductModel model) async {
+    if (model.id == null || model.id!.isEmpty) {
+      throw Exception("Product ID is missing");
+    }
     await collection.doc(model.id).update(model.toMap());
   }
 }

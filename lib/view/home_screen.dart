@@ -63,11 +63,12 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.push(
+        onPressed: () async {
+          await Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const ManageProductScreen()),
           );
+          if (mounted) context.read<ProductViewModel>().getAllProduct();
         },
         icon: const Icon(Icons.add),
         label: const Text("Add Product"),
@@ -147,13 +148,14 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 IconButton(
                   icon: const Icon(Icons.edit, color: Colors.blue),
-                  onPressed: () {
-                    Navigator.push(
+                  onPressed: () async {
+                    await Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => ManageProductScreen(id: product.id),
                       ),
                     );
+                    if (mounted) context.read<ProductViewModel>().getAllProduct();
                   },
                 ),
                 IconButton(
